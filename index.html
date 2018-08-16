@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title> Hello webGL </title>
+        <link rel="stylesheet" href="css/style.css"/>
+        <script src="js/main.js"></script>
+        <script id="vshader" type="x-shader/x-vertex">
+            attribute vec4 a_position;
+            void main()
+            {
+                gl_Position = a_position;
+            }
+        </script>
+        <script id="fshader" type="x-shader/x-fragment">
+            precision lowp float;   
+            void main()
+            {
+                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        </script>
+    <head/>
+    <body onload="webGLStart()">
+        <canvas id="canvas" width="800" height="600"></canvas>
+    </body>
+</html>
