@@ -4,16 +4,22 @@
         <script src="js/main.js"></script>
         <script id="vshader" type="x-shader/x-vertex">
             attribute vec4 a_position;
+			attribute vec3 a_color;
+			varying vec3 vColor;
+			
             void main()
             {
                 gl_Position = a_position;
+				vColor = a_color;
             }
         </script>
         <script id="fshader" type="x-shader/x-fragment">
-            precision lowp float;   
+            precision lowp float; 
+			varying vec3 vColor;	
+			
             void main()
             {
-                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+                gl_FragColor = vec4(vColor, 1.0);
             }
         </script>
     <head/>

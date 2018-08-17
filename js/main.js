@@ -85,14 +85,14 @@ function initShaders()
 function initBuffers()
 {
     var vertices =  new Float32Array([
-        0.0,  0.5,  0.0,
-        -0.5, -0.5,  0.0,
-        0.5, -0.5,  0.0
+        0.0,  0.5,  0.0, 1.0, 0.0, 0.0,
+        -0.5, -0.5,  0.0, 0.0, 1.0, 0.0,
+        0.5, -0.5,  0.0 , 0.0, 0.0, 1.0
     ]);
     triangleVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    triangleVertexPositionBuffer.itemSize = 3;
+    triangleVertexPositionBuffer.itemSize = 6;
     triangleVertexPositionBuffer.numItems = 3;
 }
 
@@ -100,8 +100,11 @@ function drawScene()
 {
     gl.useProgram(shaderProgram);
     var location = gl.getAttribLocation(shaderProgram, "a_position");
+    var color = gl.getAttribLocation(shaderProgram, "a_color");
     gl.enableVertexAttribArray(location);
+    gl.enableVertexAttribArray(color);
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-    gl.vertexAttribPointer(location, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 24, 0);
+    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 24, 12);
     gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
 }
