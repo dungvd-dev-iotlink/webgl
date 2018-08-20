@@ -6,6 +6,7 @@ function webGLStart()
     initGL(canvas);
     initShaders();
     initBuffers();
+	initTexture();
 	
 	// Key events
 	document.onkeydown = handleKeyDown;
@@ -81,9 +82,9 @@ function getShader(id)
 
     return shader;
 }
+
 function initShaders()
 {
-
     var fragmentShader = getShader( "fshader");
     var vertexShader = getShader( "vshader");
     shaderProgram = gl.createProgram();
@@ -98,18 +99,38 @@ function initShaders()
     }
 }
 
+var neheTexture;
+function initTexture() {
+	neheTexture = gl.createTexture();
+    neheTexture.image = new Image();
+    neheTexture.image.onload = function() {
+      handleLoadedTexture(neheTexture)
+    }
+    neheTexture.image.src = "texture.png";
+}
+
+function handleLoadedTexture(texture) {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+}
+
 function initBuffers()
 {
     var vertices =  new Float32Array([
-        -0.5,  0.5,  0.0, 1.0, 1.0, 0.0,
-        0.5,  0.5,  0.0, 1.0, 0.0, 0.0,
-        -0.5, -0.5,  0.0, 0.0, 1.0, 0.0,
-        0.5, -0.5,  0.0 , 0.0, 0.0, 1.0
+		// position       // color				// texcoord
+        -0.5,  0.5, 0.0, 	1.0, 1.0, 	0.0, 	0.0, 0.0,
+        0.5,  0.5, 0.0, 	1.0, 0.0,  0.0,  	1.0, 0.0,
+        -0.5, -0.5, 0.0, 	0.0, 1.0, 	0.0, 	1.0, 1.0,
+        0.5, -0.5, 0.0 , 	0.0, 0.0, 1.0, 		0.0, 1.0
     ]);
     triangleVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    triangleVertexPositionBuffer.itemSize = 6;
+    triangleVertexPositionBuffer.itemSize = 8;
     triangleVertexPositionBuffer.numItems = 4;
 }
 
@@ -118,12 +139,22 @@ function drawScene()
     gl.useProgram(shaderProgram);
     var location = gl.getAttribLocation(shaderProgram, "a_position");
     var color = gl.getAttribLocation(shaderProgram, "a_color");
+	var texcoord = gl.getAttribLocation(shaderProgram, "a_texcoord");
     gl.enableVertexAttribArray(location);
     gl.enableVertexAttribArray(color);
+    gl.enableVertexAttribArray(texcoord);
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-    gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 24, 0);
-    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 24, 12);
+    gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 32, 0);
+    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 32, 12);
+    gl.vertexAttribPointer(texcoord, 2, gl.FLOAT, false, 32, 28);
+	
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, neheTexture);
+	var textureLocation = gl.getUniformLocation(shaderProgram, "uSampler");
+	gl.uniform1i(textureLocation, 0);
+
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, triangleVertexPositionBuffer.numItems);
+	// requestAnimationFrame(drawScene);
 }
 
 function handleKeys(currentlyPressedKeys) {
