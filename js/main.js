@@ -38,6 +38,7 @@ function initGL(cv)
             return;
         }
     }
+	
     gl.viewportWidth  = cv.width;
     gl.viewportHeight = cv.height;
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -99,22 +100,25 @@ function initShaders()
     }
 }
 
-var neheTexture;
+var texture;
 function initTexture() {
-	neheTexture = gl.createTexture();
-    neheTexture.image = new Image();
-    neheTexture.image.onload = function() {
-      handleLoadedTexture(neheTexture)
+	texture = gl.createTexture();
+    texture.image = new Image();
+	texture.image.crossOrigin = "anonymous";
+
+    texture.image.onload = function() {
+		handleLoadedTexture(texture)
     }
-    neheTexture.image.src = "texture.png";
+    texture.image.src = "https://webglfundamentals.org/webgl/resources/f-texture.png";
 }
 
 function handleLoadedTexture(texture) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	// gl.generateMipmap(gl.TEXTURE_2D);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.bindTexture(gl.TEXTURE_2D, null);
 }
 
@@ -146,15 +150,14 @@ function drawScene()
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
     gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 32, 0);
     gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 32, 12);
-    gl.vertexAttribPointer(texcoord, 2, gl.FLOAT, false, 32, 28);
+    gl.vertexAttribPointer(texcoord, 2, gl.FLOAT, false, 32, 24);
 	
 	gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, neheTexture);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
 	var textureLocation = gl.getUniformLocation(shaderProgram, "uSampler");
 	gl.uniform1i(textureLocation, 0);
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, triangleVertexPositionBuffer.numItems);
-	// requestAnimationFrame(drawScene);
 }
 
 function handleKeys(currentlyPressedKeys) {
