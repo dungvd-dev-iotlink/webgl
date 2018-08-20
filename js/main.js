@@ -11,14 +11,13 @@ function webGLStart()
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;
 	function handleKeyDown(event) {
-	    console.log("#------------ key: " + event);
 		currentlyPressedKeys[event.keyCode] = true;
+		handleKeys(currentlyPressedKeys);
 	}
 	
 	function handleKeyUp(event) {
 		currentlyPressedKeys[event.keyCode] = false;
 	}
-	handleKeys(currentlyPressedKeys);
 	// End key events
 	
     drawScene();
@@ -102,7 +101,8 @@ function initShaders()
 function initBuffers()
 {
     var vertices =  new Float32Array([
-        0.0,  0.5,  0.0, 1.0, 0.0, 0.0,
+        -0.5,  0.5,  0.0, 1.0, 1.0, 0.0,
+        0.5,  0.5,  0.0, 1.0, 0.0, 0.0,
         -0.5, -0.5,  0.0, 0.0, 1.0, 0.0,
         0.5, -0.5,  0.0 , 0.0, 0.0, 1.0
     ]);
@@ -110,7 +110,7 @@ function initBuffers()
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     triangleVertexPositionBuffer.itemSize = 6;
-    triangleVertexPositionBuffer.numItems = 3;
+    triangleVertexPositionBuffer.numItems = 4;
 }
 
 function drawScene()
@@ -123,7 +123,7 @@ function drawScene()
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
     gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 24, 0);
     gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 24, 12);
-    gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, triangleVertexPositionBuffer.numItems);
 }
 
 function handleKeys(currentlyPressedKeys) {
@@ -139,11 +139,14 @@ function handleKeys(currentlyPressedKeys) {
 	}
 	if (currentlyPressedKeys[39]) {
 		// Right cursor key
+		console.log("#------------------ Bam phim Right");
 	}
 	if (currentlyPressedKeys[38]) {
 		// Up cursor key
+		console.log("#------------------ Bam phim Up");
 	}
 	if (currentlyPressedKeys[40]) {
 		// Down cursor key
+		console.log("#------------------ Bam phim Down");
 	}
 }
