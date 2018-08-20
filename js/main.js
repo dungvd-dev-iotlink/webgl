@@ -1,9 +1,26 @@
+
 function webGLStart() 
 {
+	var currentlyPressedKeys = new Int8Array(1000);
     var canvas = document.getElementById("canvas");
     initGL(canvas);
     initShaders();
     initBuffers();
+	
+	// Key events
+	document.onkeydown = handleKeyDown;
+	document.onkeyup = handleKeyUp;
+	function handleKeyDown(event) {
+	    console.log("#------------ key: " + event);
+		currentlyPressedKeys[event.keyCode] = true;
+	}
+	
+	function handleKeyUp(event) {
+		currentlyPressedKeys[event.keyCode] = false;
+	}
+	handleKeys(currentlyPressedKeys);
+	// End key events
+	
     drawScene();
 }
 
@@ -107,4 +124,26 @@ function drawScene()
     gl.vertexAttribPointer(location, 3, gl.FLOAT, false, 24, 0);
     gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 24, 12);
     gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
+}
+
+function handleKeys(currentlyPressedKeys) {
+	if (currentlyPressedKeys[33]) {
+		// Page Up
+	}
+	if (currentlyPressedKeys[34]) {
+		// Page Down
+	}
+	if (currentlyPressedKeys[37]) {
+		// Left cursor key
+		console.log("#------------------ Bam phim Left");
+	}
+	if (currentlyPressedKeys[39]) {
+		// Right cursor key
+	}
+	if (currentlyPressedKeys[38]) {
+		// Up cursor key
+	}
+	if (currentlyPressedKeys[40]) {
+		// Down cursor key
+	}
 }
