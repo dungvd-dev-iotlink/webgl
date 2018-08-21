@@ -148,6 +148,7 @@ function loadTexture(gl, url) {
 function isPowerOf2(value) {
   return (value & (value - 1)) == 0;
 }
+
 function initBuffers()
 {
     var vertices =  new Float32Array([
