@@ -156,8 +156,8 @@ function initBuffers()
 		// position       // color				// texcoord
         -0.5,  0.5, 0.0, 	1.0, 1.0, 	0.0, 	0.0, 0.0,
         0.5,  0.5, 0.0, 	1.0, 0.0,  0.0,  	1.0, 0.0,
-        -0.5, -0.5, 0.0, 	0.0, 1.0, 	0.0, 	1.0, 1.0,
-        0.5, -0.5, 0.0 , 	0.0, 0.0, 1.0, 		0.0, 1.0
+        -0.5, -0.5, 0.0, 	0.0, 1.0, 	0.0, 	0.0, 1.0,
+        0.5, -0.5, 0.0 , 	0.0, 0.0, 1.0, 		1.0, 1.0
     ]);
     triangleVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
