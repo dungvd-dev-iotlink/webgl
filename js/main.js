@@ -42,8 +42,6 @@ function initGL(cv)
     gl.viewportWidth  = cv.width;
     gl.viewportHeight = cv.height;
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-    gl.clearColor(0.1, 0.1, 0.2, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
 function getShader(id)
@@ -168,6 +166,8 @@ function initBuffers()
 
 function drawScene()
 {
+	gl.clearColor(0.1, 0.1, 0.2, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.useProgram(shaderProgram);
     var location = gl.getAttribLocation(shaderProgram, "a_position");
     var color = gl.getAttribLocation(shaderProgram, "a_color");
