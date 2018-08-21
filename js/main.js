@@ -1,4 +1,4 @@
-
+var texture;
 function webGLStart() 
 {
 	var currentlyPressedKeys = new Int8Array(1000);
@@ -6,7 +6,7 @@ function webGLStart()
     initGL(canvas);
     initShaders();
     initBuffers();
-	initTexture();
+	texture = loadTexture(gl, "https://webglfundamentals.org/webgl/resources/f-texture.png");
 	
 	// Key events
 	document.onkeydown = handleKeyDown;
@@ -100,28 +100,56 @@ function initShaders()
     }
 }
 
-var texture;
-function initTexture() {
-	texture = gl.createTexture();
-    texture.image = new Image();
-	texture.image.crossOrigin = "anonymous";
 
-    texture.image.onload = function() {
-		handleLoadedTexture(texture)
-    }
-    texture.image.src = "https://webglfundamentals.org/webgl/resources/f-texture.png";
-}
+function loadTexture(gl, url) {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
 
-function handleLoadedTexture(texture) {
+  // Because images have to be download over the internet
+  // they might take a moment until they are ready.
+  // Until then put a single pixel in the texture so we can
+  // use it immediately. When the image has finished downloading
+  // we'll update the texture with the contents of the image.
+  const level = 0;
+  const internalFormat = gl.RGBA;
+  const width = 1;
+  const height = 1;
+  const border = 0;
+  const srcFormat = gl.RGBA;
+  const srcType = gl.UNSIGNED_BYTE;
+  const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
+  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                width, height, border, srcFormat, srcType,
+                pixel);
+
+  const image = new Image();
+  image.crossOrigin = "anonymous";
+  image.onload = function() {
+	  
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-	// gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                  srcFormat, srcType, image);
+	// WebGL1 has different requirements for power of 2 images
+	// vs non power of 2 images so check if the image is a
+	// power of 2 in both dimensions.
+		if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+			// Yes, it's a power of 2. Generate mips.
+			gl.generateMipmap(gl.TEXTURE_2D);
+		} else {
+		   // No, it's not a power of 2. Turn of mips and set
+		   // wrapping to clamp to edge
+		   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		}
+	};
+	image.src = url;
+	return texture;	
 }
 
+function isPowerOf2(value) {
+  return (value & (value - 1)) == 0;
+}
 function initBuffers()
 {
     var vertices =  new Float32Array([
@@ -156,8 +184,9 @@ function drawScene()
     gl.bindTexture(gl.TEXTURE_2D, texture);
 	var textureLocation = gl.getUniformLocation(shaderProgram, "uSampler");
 	gl.uniform1i(textureLocation, 0);
-
+	
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, triangleVertexPositionBuffer.numItems);
+	requestAnimationFrame(drawScene);
 }
 
 function handleKeys(currentlyPressedKeys) {
